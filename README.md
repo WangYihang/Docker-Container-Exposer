@@ -32,3 +32,4 @@ CONTAINER_IP_START=100
 
 2. run `./up` to launch new docker container instance and bridge them into real network
 3. run `./down` to revert the changes
+4. run `./test` to test the network connection to docker containers/public network/real network/gateway etc.
