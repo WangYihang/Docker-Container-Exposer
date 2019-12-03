@@ -1,0 +1,29 @@
+#!/bin/bash -x
+
+export $(egrep -v '^#' .env | xargs)
+
+function shutdown() {
+    for i in `docker ps -a -q -f name=${CONTAINER_NAME_PREFIX}`;
+    do
+        docker stop ${i}
+        docker rm ${i}
+    done
+}
+
+function detach() {
+    COMMAND="ifconfig ${BRIDGE_IFNAME} down"
+    ${COMMAND}
+    COMMAND="brctl delbr ${BRIDGE_IFNAME}"
+    ${COMMAND}
+}
+
+function recover() {
+    COMMAND="ifconfig ${PUBLIC_IFNAME} ${BRIDGE_IP}/${CIDR}"
+    ${COMMAND}
+    COMMAND="route add default gw ${GATEWAY_IP} dev ${PUBLIC_IFNAME}"
+    ${COMMAND}
+}
+
+shutdown
+detach
+recover

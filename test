@@ -1,0 +1,30 @@
+#!/bin/bash
+
+
+export $(egrep -v '^#' .env | xargs)
+
+function start() {
+    # Test containers
+	for ((i=0;i<${CONTAINERS};i++))
+	do
+		# Assign IP address
+		IP=${NETWORK_ID}.`expr ${CONTAINER_IP_START} + ${i}`
+		COMMAND="ping -c 1 ${IP}"
+        echo ${COMMAND}
+		${COMMAND} >/dev/null
+        echo $?
+	done
+    # Test gateway
+    COMMAND="ping -c 1 ${GATEWAY_IP}"
+    echo ${COMMAND}
+	${COMMAND} >/dev/null
+    echo $?
+    # Test public network
+    COMMAND="ping -c 1 8.8.8.8"
+    echo ${COMMAND}
+	${COMMAND} >/dev/null
+    echo $?
+}
+
+start
+

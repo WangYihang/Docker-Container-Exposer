@@ -1,0 +1,64 @@
+#!/bin/bash -x
+
+export $(egrep -v '^#' .env | xargs)
+
+# Install requirements
+function setup() {
+	apt update
+	apt upgrade -y
+	apt dist-upgrade -y
+	apt clean
+	apt autoclean
+	apt remove
+	apt autoremove
+
+	apt install git
+	apt install docker
+	apt install bridge-utils
+
+	cd opt
+	git clone https://github.com/jpetazzo/pipework.git
+	ln -s /opt/pipework/pipework /usr/local/bin
+}
+
+function firewall() {
+    COMMAND="sysctl -w net.ipv4.ip_forward=1"
+    ${COMMAND}
+    COMMAND="iptables -A FORWARD -i ${BRIDGE_IFNAME} -j ACCEPT"
+    ${COMMAND}
+    COMMAND="iptables -A FORWARD -o ${BRIDGE_IFNAME} -j ACCEPT"
+    ${COMMAND}
+}
+
+# Start docker containers
+function start() {
+	for ((i=0;i<${CONTAINERS};i++))
+	do
+		# Start container with none network
+		CONTAINER_NAME=${CONTAINER_NAME_PREFIX}_${i}
+		COMMAND="docker run --privileged=true --net=none --name ${CONTAINER_NAME} -idt ${IMAGE} /bin/bash"
+		${COMMAND}
+		# Assign IP address
+		IP=${NETWORK_ID}.`expr ${CONTAINER_IP_START} + ${i}`
+		COMMAND="pipework ${BRIDGE_IFNAME} ${CONTAINER_NAME} ${IP}/${CIDR}@${GATEWAY_IP}"
+		${COMMAND}
+	done
+}
+
+function connect() {
+	COMMAND="brctl addif ${BRIDGE_IFNAME} ${PUBLIC_IFNAME}"
+	${COMMAND}
+}
+
+function attach() {
+	COMMAND="ifconfig ${PUBLIC_IFNAME} 0.0.0.0"
+	${COMMAND}
+	COMMAND="ifconfig ${BRIDGE_IFNAME} ${BRIDGE_IP}/${CIDR}"
+	${COMMAND}
+}
+
+# setup
+start
+connect
+attach
+firewall
