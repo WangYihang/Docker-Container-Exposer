@@ -2,6 +2,9 @@
 
 Expose docker containers to public network
 
+#### Network Topology
+![](https://i.imgur.com/Uw9Imix.png)
+
 #### Usage
 1. Modify `.env` file to fit on your network topology
 ```bash
