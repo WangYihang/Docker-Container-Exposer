@@ -7,16 +7,14 @@ function setup() {
 	apt update
 	apt upgrade -y
 	apt dist-upgrade -y
-	apt clean
-	apt autoclean
-	apt remove
-	apt autoremove
+	apt clean -y
+	apt autoclean -y
+	apt remove -y
+	apt autoremove -y
 
-	apt install git
-	apt install docker
-	apt install bridge-utils
+	apt install git docker bridge-utils
 
-	cd opt
+	cd /opt
 	git clone https://github.com/jpetazzo/pipework.git
 	ln -s /opt/pipework/pipework /usr/local/bin
 }
