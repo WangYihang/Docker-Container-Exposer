@@ -12,7 +12,7 @@ function setup() {
 	apt remove -y
 	apt autoremove -y
 
-	apt install git docker bridge-utils
+	apt install -y git docker.io bridge-utils
 
 	cd /opt
 	git clone https://github.com/jpetazzo/pipework.git
