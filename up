@@ -22,9 +22,13 @@ function setup() {
 function firewall() {
     COMMAND="sysctl -w net.ipv4.ip_forward=1"
     ${COMMAND}
-    COMMAND="iptables -A FORWARD -i ${BRIDGE_IFNAME} -j ACCEPT"
+    COMMAND="iptables -D FORWARD -i ${BRIDGE_IFNAME} -j ACCEPT"
     ${COMMAND}
-    COMMAND="iptables -A FORWARD -o ${BRIDGE_IFNAME} -j ACCEPT"
+    COMMAND="iptables -D FORWARD -o ${BRIDGE_IFNAME} -j ACCEPT"
+    ${COMMAND}
+    COMMAND="iptables -I FORWARD -i ${BRIDGE_IFNAME} -j ACCEPT"
+    ${COMMAND}
+    COMMAND="iptables -I FORWARD -o ${BRIDGE_IFNAME} -j ACCEPT"
     ${COMMAND}
 }
 
