@@ -62,7 +62,7 @@ function attach() {
 function restart() {
     for i in `docker ps -a -q -f name=${CONTAINER_NAME_PREFIX}`;
     do
-        COMMAND="docker exec ${i} yum install -y nginx"
+        COMMAND="docker exec ${i} nginx"
         echo ${COMMAND}
     done
 }
