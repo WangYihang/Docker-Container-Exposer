@@ -34,7 +34,7 @@ function start() {
 	do
 		# Start container with none network
 		CONTAINER_NAME=${CONTAINER_NAME_PREFIX}_${i}
-		COMMAND="docker run --privileged=true --net=none --name ${CONTAINER_NAME} -idt ${IMAGE} /bin/bash"
+		COMMAND="docker run --privileged=true --net=none --name ${CONTAINER_NAME} -idt ${IMAGE}"
 		${COMMAND}
 		# Assign IP address
 		IP=${NETWORK_ID}.`expr ${CONTAINER_IP_START} + ${i}`
@@ -55,8 +55,17 @@ function attach() {
 	${COMMAND}
 }
 
+function restart() {
+    for i in `docker ps -a -q -f name=${CONTAINER_NAME_PREFIX}`;
+    do
+        COMMAND="docker exec ${i} yum install -y nginx"
+        echo ${COMMAND}
+    done
+}
+
 setup
 start
 connect
 attach
 firewall
+restart
